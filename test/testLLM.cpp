@@ -22,8 +22,15 @@ TEST(DeepSeekProviderTest, sendMessage) {
 
     std::vector<ai_chat_sdk::Message> messages;
     messages.push_back(ai_chat_sdk::Message("user", "你是谁"));
-    std::string response = provider->sendMessage(messages, requestParams);
-    ASSERT_TRUE(!response.empty());
+    // std::string response = provider->sendMessage(messages, requestParams); // 全量响应
+    auto writechunk = [&](const std::string& chunk, bool last){
+        INFO("chunk : {}", chunk);
+        if(last){
+            INFO("[DONE]");
+        }
+    };
+    std::string response = provider->sendMessageStream(messages, requestParams, writechunk); // 流式响应
+    ASSERT_FALSE(!response.empty());
 }
 
 int main(int argc, char **argv) {
