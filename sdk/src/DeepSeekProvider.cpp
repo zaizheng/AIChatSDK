@@ -79,15 +79,17 @@ namespace ai_chat_sdk {
         // 6、发送POST请求
         auto resp = client.Post("/v1/chat/completions", headers, requestBodyStr, "application/json");
         if (!resp) {
-            ERR("DeepSeekProvider sendMessage POST request failed");
+            auto err = resp.error();
+            ERR("DeepSeekProvider sendMessage POST request failed, error: {}, error_message: {}", 
+                static_cast<int>(err), httplib::to_string(err));
             return "";
         }
-        INFO("DeepSeekProvider sendMessage POST request success, status : {}",resp->status);
-        INFO("DeepSeekProvider sendMessage POST request body : {}", resp->body);
         // 检测响应是否成功
         if (resp->status != 200) {
+            INFO("DeepSeekProvider sendMessage POST request failed, status : {}",resp->status);
             return "";
         }
+        INFO("DeepSeekProvider sendMessage POST request body : {}", resp->body);
         // 7、解析响应体
         Json::Value responseBody;
         Json::CharReaderBuilder readerBuilder;
@@ -225,7 +227,9 @@ namespace ai_chat_sdk {
         };
         auto result = client.send(req);
         if (!result) {
-            ERR("Network error {}", to_string(result.error()));
+            auto err = result.error();
+            ERR("DeepSeekProvider sendMessageStream POST request failed, error: {}, error_message: {}", 
+                static_cast<int>(err), httplib::to_string(err));
             return "";
         }
         if (!streamEnd) {

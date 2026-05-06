@@ -9,7 +9,8 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_executable(testLLM testLLM.cpp
 ../sdk/src/util/myLog.cpp
-../sdk/src/DeepSeekProvider.cpp)
+../sdk/src/DeepSeekProvider.cpp
+../sdk/src/ChatGPTProvider.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
