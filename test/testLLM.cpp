@@ -55,8 +55,16 @@ TEST(ChatGPTProviderTest, sendMessage) {
 
     std::vector<ai_chat_sdk::Message> messages;
     messages.push_back(ai_chat_sdk::Message("user", "你是谁"));
-    std::string response = provider->sendMessage(messages, requestParams); // 全量响应
-    ASSERT_FALSE(!response.empty());
+    // std::string response = provider->sendMessage(messages, requestParams); // 全量响应
+    auto writeChunk = [&](const std::string& chunk, bool last){ 
+        INFO("chunk : {}", chunk);
+        if(last){
+            INFO("[DONE]"); 
+        } 
+    };
+    std::string fullData = provider->sendMessageStream(messages, requestParams, writeChunk);
+    ASSERT_FALSE(fullData.empty());
+    INFO("response : {}", fullData);
 }
 
 int main(int argc, char **argv) {

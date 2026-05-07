@@ -32,8 +32,9 @@ namespace ai_chat_sdk {
     std::string DeepSeekProvider::getModelDes() const { return "深度求索"; }
 
     // 全量返回
-    std::string DeepSeekProvider::sendMessage(const std::vector<Message> &messages,
-                                              const std::map<std::string, std::string> &requestParams) {
+    std::string DeepSeekProvider::sendMessage(
+        const std::vector<Message> &messages,
+        const std::map<std::string, std::string> &requestParams) {
         // 1、模型是否可用
         if(!isAvailable()){
             ERR("DeepSeekProvider sendMessage model not available");
@@ -110,9 +111,10 @@ namespace ai_chat_sdk {
         return "deepseek response json parse failed";
     }
     // 流式返回
-    std::string DeepSeekProvider::sendMessageStream(const std::vector<Message> &messages,
-                                                    const std::map<std::string, std::string> &requestParams,
-                                                    std::function<void(const std::string&, bool)> callback) {
+    std::string DeepSeekProvider::sendMessageStream(
+        const std::vector<Message> &messages,
+        const std::map<std::string, std::string> &requestParams,
+        std::function<void(const std::string &, bool)> callback) {
         // 1、模型是否可用
         if(!isAvailable()){
             ERR("DeepSeekProvider sendMessageStream model not available");
@@ -226,10 +228,8 @@ namespace ai_chat_sdk {
             return true;
         };
         auto result = client.send(req);
-        if (!result) {
-            auto err = result.error();
-            ERR("DeepSeekProvider sendMessageStream POST request failed, error: {}, error_message: {}", 
-                static_cast<int>(err), httplib::to_string(err));
+        if(!result){
+            ERR("DeepSeekProvider sendMessageStream POST request failed, error: {}", to_string(result.error()));
             return "";
         }
         if (!streamEnd) {
