@@ -90,7 +90,14 @@ TEST(OllamaLLMProviderTest, sendMessage){
 
     // 实例化DeepSeekProvider的对象
     // 调用sendMessage方法
-    std::string fullData = provider->sendMessage(messages, requestParam);
+    // std::string fullData = provider->sendMessage(messages, requestParam);
+    auto writeChunk = [&](const std::string& chunk, bool last){ 
+        INFO("chunk : {}", chunk);
+        if(last){
+            INFO("[DONE]"); 
+        } 
+    };
+    std::string fullData = provider->sendMessageStream(messages, requestParam, writeChunk);
     ASSERT_FALSE(fullData.empty());
     INFO("response : {}", fullData);
 }

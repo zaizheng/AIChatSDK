@@ -178,12 +178,12 @@ namespace ai_chat_sdk {
         req.body = requestBodyStr;
         // 设置响应处理函数
         req.response_handler = [&](const httplib::Response &resp) {
-          if (resp.status != 200) {
-            getError = true;
-            errorMsg = "Http status code : " + std::to_string(resp.status);
-            return false;
-          }
-          return true;
+            if (resp.status != 200) {
+                getError = true;
+                errorMsg = "Http status code : " + std::to_string(resp.status);
+                return false;
+            }
+            return true;
         };
         req.content_receiver = [&](const char *data, size_t len, size_t offset,
                                    size_t totalLength) {
