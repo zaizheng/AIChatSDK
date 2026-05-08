@@ -29,13 +29,13 @@ namespace ai_chat_sdk {
     // LLM信息
     struct ModelInfo {
         std::string _modelName;     // 模型名称
-        std::string _modelDes;      // 模型描述
+        std::string _modelDesc;      // 模型描述
         std::string _provider;      // 模型提供方
         std::string _endpoint;      // base url
         bool _isAvailable = false;  // 是否可用
 
-        ModelInfo(const std::string& modelName = "", const std::string& modelDes = "", const std::string& provider = "", const std::string& endpoint = "")
-            : _modelName(modelName), _modelDes(modelDes), _provider(provider), _endpoint(endpoint) {}
+        ModelInfo(const std::string& modelName = "", const std::string& modelDesc = "", const std::string& provider = "", const std::string& endpoint = "")
+            : _modelName(modelName), _modelDesc(modelDesc), _provider(provider), _endpoint(endpoint) {}
     };
 
     // 会话信息

@@ -3,6 +3,7 @@
 #include <jsoncpp/json/json.h>
 #include <httplib.h>
 #include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/value.h>
 #include <sstream>
 
 namespace ai_chat_sdk {
@@ -30,7 +31,7 @@ namespace ai_chat_sdk {
 
     std::string ChatGPTProvider::getModelName() const { return "gpt-4o-mini"; }
 
-    std::string ChatGPTProvider::getModelDes() const { return "OpenAI 推出的轻量级、高性价比模型，核心能力解决 GPT-4 Turbo，但更经济"; }
+    std::string ChatGPTProvider::getModelDesc() const { return "OpenAI 推出的轻量级、高性价比模型，核心能力解决 GPT-4 Turbo，但更经济"; }
 
      // 全量返回
     std::string ChatGPTProvider::sendMessage(

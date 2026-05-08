@@ -1,8 +1,8 @@
 #pragma once
-#include <map>
-#include <string>
-#include <vector>
 #include <functional>
+#include <string>
+#include <map>
+#include <vector>
 #include "common.h"
 
 namespace ai_chat_sdk {
@@ -16,7 +16,7 @@ namespace ai_chat_sdk {
         virtual bool initModel(const std::map<std::string, std::string>& modelConfig) = 0;
         virtual bool isAvailable() const = 0;
         virtual std::string getModelName() const = 0;
-        virtual std::string getModelDes() const = 0;
+        virtual std::string getModelDesc() const = 0;
         // 全量返回
         virtual std::string sendMessage(const std::vector<Message>& messages, const std::map<std::string, std::string>& requestParams) = 0;
         // 流式返回

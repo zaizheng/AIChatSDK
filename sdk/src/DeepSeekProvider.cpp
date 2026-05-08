@@ -29,7 +29,7 @@ namespace ai_chat_sdk {
 
     std::string DeepSeekProvider::getModelName() const { return "deepseek-chat"; }
 
-    std::string DeepSeekProvider::getModelDes() const { return "深度求索"; }
+    std::string DeepSeekProvider::getModelDesc() const { return "深度求索"; }
 
     // 全量返回
     std::string DeepSeekProvider::sendMessage(

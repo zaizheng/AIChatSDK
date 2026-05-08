@@ -1,9 +1,9 @@
 #include "LLMProvider.h"
 
-#include <map>
-#include <string>
-#include <vector>
 #include <functional>
+#include <string>
+#include <map>
+#include <vector>
 #include "common.h"
 
 namespace ai_chat_sdk {
@@ -12,7 +12,7 @@ namespace ai_chat_sdk {
         virtual bool initModel(const std::map<std::string, std::string>& modelConfig);
         virtual bool isAvailable() const;
         virtual std::string getModelName() const;
-        virtual std::string getModelDes() const;
+        virtual std::string getModelDesc() const;
         // 全量返回
         virtual std::string sendMessage(const std::vector<Message>& messages, const std::map<std::string, std::string>& requestParams);
         // 流式返回
