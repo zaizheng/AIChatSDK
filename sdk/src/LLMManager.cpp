@@ -16,11 +16,20 @@ namespace ai_chat_sdk {
     // 初始化指定模型
     bool LLMManager::initModel(const std::string &modelName,
                                const std::map<std::string, std::string> &modelParam) {
-        if (_providers.find(modelName) == _providers.end()) {
+        auto it = _providers.find(modelName);
+        if (it == _providers.end()) {
             return false;
         }
-        _modelInfos[modelName] = _providers[modelName].get()->initModel(modelParam);
-        return _modelInfos[modelName]._isAvailable;
+        bool isSuccess = it->second->initModel(modelParam);
+        if (!isSuccess) {
+            ERR("init model failed, modelName = {}", modelName);
+            return false;
+        } else {
+            INFO("init model success, modelName = {}", modelName);
+            _modelInfos[modelName]._isAvailable = true;
+            _modelInfos[modelName]._modelDesc = it->second->getModelDesc();
+        }
+        return isSuccess;
     }
     // 获取可用模型
     std::vector<ModelInfo> LLMManager::getAvailableModels() const {
@@ -34,6 +43,41 @@ namespace ai_chat_sdk {
     }
     // 检测模型是否可以使用
     bool LLMManager::isModelAvailable(const std::string &modelName) const {
-        return _modelInfos.find(modelName) != _modelInfos.end() && _modelInfos[modelName]._isAvailable;
+        auto it = _modelInfos.find(modelName);
+        if (it == _modelInfos.end()) {
+            return false;
+        }
+        return it->second._isAvailable;
+    }
+    // 发送消息给指定模型
+    std::string LLMManager::sendMessage(
+        const std::string &modelName, const std::vector<Message> &messages,
+        const std::map<std::string, std::string> &requestParam) {
+        auto it = _providers.find(modelName);
+        if (it == _providers.end()) {
+            ERR("model not found, modelName = {}", modelName);
+            return "";
+        }
+        if (!it->second->isAvailable()) {
+            ERR("model not available, modelName = {}", modelName);
+            return "";
+        }
+        return it->second->sendMessage(messages, requestParam);
+    }
+    // 发送流式消息给指定模型
+    std::string LLMManager::sendMessageStream(
+        const std::string &modelName, const std::vector<Message> &messages,
+        const std::map<std::string, std::string> &requestParam,
+        std::function<void(const std::string &, bool)> &callback) {
+        auto it = _providers.find(modelName);
+        if (it == _providers.end()) {
+            ERR("model not found, modelName = {}", modelName);
+            return "";
+        }
+        if (!it->second->isAvailable()) {
+            ERR("model not available, modelName = {}", modelName);
+            return "";
+        }
+        return it->second->sendMessageStream(messages, requestParam, callback);
     }
 }
