@@ -11,7 +11,11 @@ add_executable(testLLM testLLM.cpp
 ../sdk/src/util/myLog.cpp
 ../sdk/src/DeepSeekProvider.cpp
 ../sdk/src/ChatGPTProvider.cpp
-../sdk/src/OllamaLLMProvider.cpp)
+../sdk/src/OllamaLLMProvider.cpp
+../sdk/src/DataManager.cpp
+../sdk/src/SessionManager.cpp
+../sdk/src/LLMManager.cpp
+../sdk/src/ChatSDK.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
@@ -22,5 +26,5 @@ include_directories(${OPENSSL_INCLUDE_DIR})
 
 target_compile_definitions(testLLM PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
 
-target_link_libraries(testLLM jsoncpp fmt spdlog gtest OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(testLLM jsoncpp fmt spdlog gtest OpenSSL::SSL OpenSSL::Crypto sqlite3)
  

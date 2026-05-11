@@ -26,7 +26,7 @@ namespace ai_chat_sdk {
         messageCounter++;
         std::time_t time = std::time(nullptr);
         std::ostringstream os;
-        os<<"message_"<<time<<"_"<<std::setw(8)<<std::setfill('0')<<_sessionCounter;
+        os<<"message_"<<time<<"_"<<std::setw(8)<<std::setfill('0')<<messageCounter;
         return os.str();
     }
     // 创建会话
@@ -102,11 +102,11 @@ namespace ai_chat_sdk {
     void SessionManager::updateSessionTimestamp(const std::string &sessionId) {
         _mutex.lock();
         auto it = _sessions.find(sessionId);
-        if (it == _sessions.end()) {
+        if (it != _sessions.end()) {
             it->second->_updatedAt = std::time(nullptr);
         }
         _mutex.unlock();
-        _dataManager.updateSessionTimestamp(sessionId, it->second->_updatedAt);
+        _dataManager.updateSessionTimestamp(sessionId, std::time(nullptr));
         INFO("SessionManager::updateSessionTimestamp: sessionId {}", sessionId);
     }
     // 获取会话列表

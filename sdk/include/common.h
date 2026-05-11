@@ -27,7 +27,6 @@ namespace ai_chat_sdk {
     };
 
     struct OllamaConfig : public Config {
-        std::string _modelName;
         std::string _modelDesc;
         std::string _endpoint;
     };

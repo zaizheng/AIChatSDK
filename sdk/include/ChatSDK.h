@@ -9,9 +9,9 @@ namespace ai_chat_sdk {
             bool _initialized = false; // 是否初始化
             std::unordered_map<std::string, std::shared_ptr<Config>> _modelConfigs;
             LLMManager _llmManager;
-            SessionManager _sessionManager;
 
         public:
+            SessionManager _sessionManager;
             // 初始化模型
             bool initModels(const std::vector<std::shared_ptr<Config>>& configs);
             // 创建会话

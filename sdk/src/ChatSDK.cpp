@@ -76,7 +76,7 @@ namespace ai_chat_sdk {
         }
         if (_llmManager.isModelAvailable(modelName)) {
             INFO("ChatSDK initAPIModelProvider model {} is already available", modelName);
-            return false;
+            return true;
         }
         std::map<std::string, std::string> modelParams;
         modelParams["api_key"] = apiConfig->_apiKey;
@@ -100,7 +100,7 @@ namespace ai_chat_sdk {
         }
         if (_llmManager.isModelAvailable(modelName)) {
             INFO("ChatSDK initOllamaModelProvider model {} is already available", modelName);
-            return false;
+            return true;
         }
         std::map<std::string, std::string> modelParams;
         modelParams["model_name"] = ollamaConfig->_modelName;

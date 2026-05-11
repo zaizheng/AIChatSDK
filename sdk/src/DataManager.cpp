@@ -21,7 +21,6 @@ namespace ai_chat_sdk {
     DataManager::~DataManager() {
         if (_db) {
             sqlite3_close(_db);
-            _db = nullptr;
         }
     }
     // 初始化数据库
@@ -60,9 +59,11 @@ namespace ai_chat_sdk {
             ERR("DataManager::executeSQL: database is null");
             return false;
         }
-        int rc = sqlite3_exec(_db, sql.c_str(), nullptr, nullptr, nullptr);
+        char* errMsg = nullptr;
+        int rc = sqlite3_exec(_db, sql.c_str(), nullptr, nullptr, &errMsg);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::executeSQL: execute SQL failed: {}", sqlite3_errmsg(_db));
+            ERR("DataManager::executeSQL: execute SQL failed: {}", errMsg);
+            sqlite3_free(errMsg);
             return false;
         }
         return true;
@@ -197,8 +198,7 @@ namespace ai_chat_sdk {
             return {};
         }
         std::vector<std::string> sessionIds;
-        rc = sqlite3_step(stmt);
-        while (rc == SQLITE_ROW) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
             sessionIds.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
         }
         sqlite3_finalize(stmt);
@@ -218,8 +218,7 @@ namespace ai_chat_sdk {
             return {};
         }
         std::vector<std::shared_ptr<Session>> sessions;
-        rc = sqlite3_step(stmt);
-        while (rc == SQLITE_ROW) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
             std::string sessionId = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
             std::string modelName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
             int64_t createdAt = sqlite3_column_int64(stmt, 2);
@@ -308,7 +307,7 @@ namespace ai_chat_sdk {
         }
         // 同时更新session的update_time
         std::string updateSessionSql = R"(
-            UPDATE sessions SET updatedAt = ? WHERE sessionId = ?
+            UPDATE sessions SET update_time = ? WHERE session_id = ?;
         )";
         sqlite3_stmt *updateStmt;
         rc = sqlite3_prepare_v2(_db, updateSessionSql.c_str(), -1, &updateStmt, nullptr);
@@ -322,7 +321,7 @@ namespace ai_chat_sdk {
         rc = sqlite3_step(updateStmt);
         if (rc != SQLITE_DONE) {
             ERR("DataManager::insertMessage: step statement failed: {}", sqlite3_errmsg(_db));
-            sqlite3_finalize(stmt);
+            sqlite3_finalize(updateStmt);
             return false;
         }
         sqlite3_finalize(stmt);

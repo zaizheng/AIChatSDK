@@ -87,7 +87,7 @@ namespace ai_chat_sdk {
         }
         // 检测响应是否成功
         if (resp->status != 200) {
-            INFO("DeepSeekProvider sendMessage POST request failed, status : {}",resp->status);
+            ERR("DeepSeekProvider sendMessage POST request failed, status : {}",resp->status);
             return "";
         }
         INFO("DeepSeekProvider sendMessage POST request body : {}", resp->body);
@@ -156,7 +156,7 @@ namespace ai_chat_sdk {
         // 设置请求头
         httplib::Headers headers = {{"Authorization", "Bearer " + _apiKey},
                                     {"Content-Type", "application/json"},
-                                    {"Accept", "txt/event-stream"}};
+                                    {"Accept", "text/event-stream"}};
 
         // 流式处理变量
         std::string buffer;
@@ -209,7 +209,7 @@ namespace ai_chat_sdk {
                     Json::CharReaderBuilder reader;
                     std::string errors;
                     std::istringstream modelDataStream(modelData);
-                    if (!Json::parseFromStream(reader, modelDataStream,
+                    if (Json::parseFromStream(reader, modelDataStream,
                                                &modelDataJson, &errors)) {
                       if (modelDataJson.isMember("choices") &&
                           modelDataJson["choices"].isArray() &&

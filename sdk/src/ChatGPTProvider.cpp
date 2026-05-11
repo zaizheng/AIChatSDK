@@ -162,7 +162,7 @@ namespace ai_chat_sdk {
         // 设置请求头
         httplib::Headers headers = {{"Authorization", "Bearer " + _apiKey},
                                     {"Content-Type", "application/json"},
-                                    {"Accept", "txt/event-stream"}};
+                                    {"Accept", "text/event-stream"}};
         // 流式处理变量
         std::string buffer;
         bool getError = false;

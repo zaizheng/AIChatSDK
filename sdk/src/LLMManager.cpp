@@ -1,6 +1,6 @@
 #include "../include/LLMManager.h"
 #include "../include/util/myLog.h"
-
+#include "../include/common.h"
 namespace ai_chat_sdk {
     // 注册LLM提供者
     bool LLMManager::registerProvider(const std::string& modelName, std::unique_ptr<LLMProvider> provider) {
@@ -23,11 +23,10 @@ namespace ai_chat_sdk {
         bool isSuccess = it->second->initModel(modelParam);
         if (!isSuccess) {
             ERR("init model failed, modelName = {}", modelName);
-            return false;
         } else {
             INFO("init model success, modelName = {}", modelName);
-            _modelInfos[modelName]._isAvailable = true;
             _modelInfos[modelName]._modelDesc = it->second->getModelDesc();
+            _modelInfos[modelName]._isAvailable = true;
         }
         return isSuccess;
     }
