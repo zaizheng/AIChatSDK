@@ -98,7 +98,7 @@ namespace ai_chat_sdk {
         return true;
     }
     // 获取会话信息
-    std::shared_ptr<Session> DataManager::getSessionInfo(const std::string &sessionId) const {
+    std::shared_ptr<Session> DataManager::getSession(const std::string &sessionId) const {
         std::lock_guard<std::mutex> lock(_mutex);
         std::string selectSessionSql = R"(
             SELECT model_name, create_time, update_time FROM sessions WHERE session_id = ?;

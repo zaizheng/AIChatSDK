@@ -5,7 +5,7 @@
 #include <atomic>
 #include <memory>
 #include "common.h"
-
+#include "DataManager.h"
 
 
 namespace ai_chat_sdk {
@@ -15,18 +15,20 @@ namespace ai_chat_sdk {
         std::unordered_map<std::string, std::shared_ptr<Session>> _sessions;
         mutable std::mutex _mutex;
         std::atomic<int64_t> _sessionCounter = {0};
+        DataManager _dataManager;
 
     private:
         // 生成会话ID
         std::string generateSessionId();
         // 生成消息ID
         std::string generateMessageId(size_t messageCounter);
-        
+
     public:
+        SessionManager(const std::string &dbName = "chatDB.db");
         // 创建会话
         std::string createSession(const std::string &modelName);
         // 获取会话信息
-        std::shared_ptr<Session>getSessionInfo(const std::string &sessionId) const;
+        std::shared_ptr<Session> getSession(const std::string &sessionId);
         // 向某个会话中添加信息
         bool addMessage(const std::string &sessionId, const Message &message);
         // 获取某个会话的所有历史消息

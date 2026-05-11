@@ -26,7 +26,7 @@ namespace ai_chat_sdk {
         // 插入新会话
         bool insertSession(const Session &session);
         // 获取会话信息
-        std::shared_ptr<Session> getSessionInfo(const std::string &sessionId) const;
+        std::shared_ptr<Session> getSession(const std::string &sessionId) const;
         // 更新会话时间戳
         bool updateSessionTimestamp(const std::string &sessionId);
         // 删除会话
