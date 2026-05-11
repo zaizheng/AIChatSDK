@@ -26,6 +26,12 @@ namespace ai_chat_sdk {
         std::string _apiKey;  // API密钥
     };
 
+    struct OllamaConfig : public Config {
+        std::string _modelName;
+        std::string _modelDesc;
+        std::string _endpoint;
+    };
+
     // LLM信息
     struct ModelInfo {
         std::string _modelName;     // 模型名称

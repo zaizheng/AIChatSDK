@@ -28,7 +28,7 @@ namespace ai_chat_sdk {
         // 获取会话信息
         std::shared_ptr<Session> getSession(const std::string &sessionId) const;
         // 更新会话时间戳
-        bool updateSessionTimestamp(const std::string &sessionId);
+        bool updateSessionTimestamp(const std::string &sessionId, std::time_t timestamp);
         // 删除会话
         bool deleteSession(const std::string &sessionId);
         // 获取所有会话ID

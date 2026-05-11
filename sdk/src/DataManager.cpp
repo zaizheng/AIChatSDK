@@ -134,7 +134,7 @@ namespace ai_chat_sdk {
         return session;
     }
     // 更新会话时间戳
-    bool DataManager::updateSessionTimestamp(const std::string &sessionId) {
+    bool DataManager::updateSessionTimestamp(const std::string &sessionId, std::time_t timestamp) {    
         std::lock_guard<std::mutex> lock(_mutex);
         std::string updateSessionSql = R"(
             UPDATE sessions SET update_time = ? WHERE session_id = ?;
@@ -146,7 +146,7 @@ namespace ai_chat_sdk {
             return false;
         }
         // bind
-        sqlite3_bind_int64(stmt, 1, static_cast<int64_t>(std::time(nullptr)));
+        sqlite3_bind_int64(stmt, 1, static_cast<int64_t>(timestamp));
         sqlite3_bind_text(stmt, 2, sessionId.c_str(), -1, SQLITE_TRANSIENT);
         // execute
         rc = sqlite3_step(stmt);

@@ -52,6 +52,7 @@ namespace ai_chat_sdk {
             it->second->_messages = _dataManager.getSessionMessages(sessionId);
             return it->second;
         }
+        _mutex.unlock();
         // 数据库中查找
         auto session = _dataManager.getSession(sessionId);
         if (session) {
@@ -80,14 +81,14 @@ namespace ai_chat_sdk {
         msg._timestamp = std::time(nullptr);
         INFO("message Info: content {}  timestamp {}", msg._content, msg._timestamp);
         it->second->_messages.push_back(msg);
-        it->second->_updatedAt = msg._timestamp;
+        it->second->_updatedAt = std::time(nullptr);
         INFO("SessionManager::addMessage: sessionId {}, message.content {}", sessionId, msg._content);
         _mutex.unlock();
         _dataManager.insertMessage(sessionId, msg);
         return true;
     }
     // 获取某个会话的所有历史消息
-    std::vector<Message> SessionManager::getMessages(const std::string &sessionId) const {
+    std::vector<Message> SessionManager::getHistoryMessages(const std::string &sessionId) const {
         _mutex.lock();
         auto it = _sessions.find(sessionId);
         if (it != _sessions.end()) {
@@ -102,11 +103,10 @@ namespace ai_chat_sdk {
         _mutex.lock();
         auto it = _sessions.find(sessionId);
         if (it == _sessions.end()) {
-            _mutex.unlock();
-            return;
+            it->second->_updatedAt = std::time(nullptr);
         }
         _mutex.unlock();
-        _dataManager.updateSessionTimestamp(sessionId);
+        _dataManager.updateSessionTimestamp(sessionId, it->second->_updatedAt);
         INFO("SessionManager::updateSessionTimestamp: sessionId {}", sessionId);
     }
     // 获取会话列表
@@ -116,10 +116,10 @@ namespace ai_chat_sdk {
         // 按时间戳排序会话列表
         std::vector<std::pair<std::time_t, std::shared_ptr<Session>>> temp;
         temp.reserve(session.size());
-        for (auto &it : _sessions) {
+        for (const auto &it : _sessions) {
             temp.emplace_back(it.second->_updatedAt, it.second);
         }
-        for (auto &it : session) {
+        for (const auto &it : session) {
             if (_sessions.find(it->_sessionId) == _sessions.end()) {
                 temp.emplace_back(it->_updatedAt, it);
             }
@@ -129,7 +129,7 @@ namespace ai_chat_sdk {
         });
         std::vector<std::string> sessionIds;
         sessionIds.reserve(_sessions.size());
-        for (auto &it : temp) {
+        for (const auto &it : temp) {
             sessionIds.push_back(it.second->_sessionId);
         }
         return sessionIds;

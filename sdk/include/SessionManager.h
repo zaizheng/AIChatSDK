@@ -32,7 +32,7 @@ namespace ai_chat_sdk {
         // 向某个会话中添加信息
         bool addMessage(const std::string &sessionId, const Message &message);
         // 获取某个会话的所有历史消息
-        std::vector<Message> getMessages(const std::string &sessionId) const;
+        std::vector<Message> getHistoryMessages(const std::string &sessionId) const;
         // 更新会话时间戳
         void updateSessionTimestamp(const std::string &sessionId);
         // 获取会话列表
