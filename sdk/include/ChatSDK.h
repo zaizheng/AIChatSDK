@@ -27,7 +27,7 @@ namespace ai_chat_sdk {
             // 发送消息给指定模型
             std::string sendMessage(const std::string &sessionId, const std::string& message);
             // 发送流式消息给指定模型
-            std::string sendMessageStream(const std::string &sessionId, const std::string& message, std::function<void(const std::string&, bool)>& callback);
+            std::string sendMessageStream(const std::string &sessionId, const std::string& message, std::function<void(const std::string&, bool)> callback);
 
         private:
             // 注册支持的模型提供器

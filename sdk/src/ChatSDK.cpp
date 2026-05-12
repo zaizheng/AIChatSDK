@@ -205,7 +205,7 @@ namespace ai_chat_sdk {
         return response;
     }
     // 发送流式消息给指定模型
-    std::string ChatSDK::sendMessageStream(const std::string &sessionId, const std::string& message, std::function<void(const std::string&, bool)>& callback) {
+    std::string ChatSDK::sendMessageStream(const std::string &sessionId, const std::string& message, std::function<void(const std::string&, bool)> callback) {
         if (!_initialized) {
             ERR("ChatSDK sendMessageStream not initialized");
             return "";
