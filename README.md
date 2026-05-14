@@ -46,20 +46,29 @@ AIChatSDK/
 ### 安装依赖（Ubuntu Linux）
 
 ```bash
-# 更新系统包
-sudo apt update && sudo apt upgrade -y
-
 # 安装基础编译工具
 sudo apt install -y build-essential cmake git
-
-# 安装系统级依赖库
-sudo apt install -y libgflags-dev libspdlog-dev nlohmann-json3-dev
 
 # 安装 httplib（头文件库，通过源码安装）
 git clone https://github.com/yhirose/cpp-httplib.git
 cd cpp-httplib
 sudo cp -r include/httplib /usr/local/include/
 cd .. && rm -rf cpp-httplib
+
+# 安装 gflags
+sudo apt-get install libgflags-dev
+
+# 安装 spdlog
+sudo apt-get install libspdlog-dev
+
+# 安装 fmt
+sudo apt-get install fmt
+
+# 安装 jsoncpp
+sudo apt-get install libjsoncpp-dev
+
+# 安装 ssl
+sudo apt-get install libssl-dev
 ```
 
 ### 编译构建
