@@ -57,7 +57,7 @@ namespace ai_chat_server{
 
         setHttpRoutes();
 
-        _chatServer->set_mount_point("/", "./www");
+        _chatServer->set_mount_point("/", "../www");
 
         std::thread serverThread([this](){
             _chatServer->listen(_config.host, _config.port);
