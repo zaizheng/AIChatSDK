@@ -201,6 +201,7 @@ namespace ai_chat_sdk {
                     std::string modelData = chunk.substr(6);
                     // 标记是否结束
                     if (modelData == "[DONE]") {
+                        callback("", true);
                         streamEnd = true;
                         return true;
                     }
