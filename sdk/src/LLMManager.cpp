@@ -67,7 +67,7 @@ namespace ai_chat_sdk {
     std::string LLMManager::sendMessageStream(
         const std::string &modelName, const std::vector<Message> &messages,
         const std::map<std::string, std::string> &requestParam,
-        std::function<void(const std::string &, bool)> &callback) {
+        std::function<void(const std::string &, bool)> callback) {
         auto it = _providers.find(modelName);
         if (it == _providers.end()) {
             ERR("model not found, modelName = {}", modelName);

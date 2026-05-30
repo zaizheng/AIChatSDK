@@ -24,6 +24,9 @@ Makefile
 *.swo
 *~
 
+# Documentation (screenshots, docs)
+docs/
+
 # Logs
 *.log
 *.txt

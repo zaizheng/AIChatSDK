@@ -25,6 +25,6 @@ namespace ai_chat_sdk {
         // 发送消息给指定模型
         std::string sendMessage(const std::string &modelName, const std::vector<Message>& messages, const std::map<std::string, std::string>& requestParam);
         // 发送流式消息给指定模型
-        std::string sendMessageStream(const std::string& modelName, const std::vector<Message>& messages, const std::map<std::string, std::string>& requestParam, std::function<void(const std::string&, bool)>& callback);
+        std::string sendMessageStream(const std::string& modelName, const std::vector<Message>& messages, const std::map<std::string, std::string>& requestParam, std::function<void(const std::string&, bool)> callback);
     };
 }
