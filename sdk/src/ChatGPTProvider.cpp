@@ -10,7 +10,7 @@ namespace ai_chat_sdk {
     bool ChatGPTProvider::initModel(const std::map<std::string, std::string>& modelConfig) {
         auto it = modelConfig.find("api_key");
         if (it == modelConfig.end()) {
-            ERR("ChatGPTProvider initModel api_key not found");
+            ERR("ChatGPT初始化失败: api_key未找到");
             return false;
         } else {
             _apiKey = it->second;
@@ -23,7 +23,7 @@ namespace ai_chat_sdk {
         }
         
         _isAvailable = true;
-        INFO("ChatGPTProvider initModel success, endpoint: {}",_endpoint);
+        INFO("ChatGPT初始化成功, endpoint: {}",_endpoint);
         return true;
     }
 
@@ -39,7 +39,7 @@ namespace ai_chat_sdk {
         const std::map<std::string, std::string> &requestParams) {
         // 1、模型是否可用
         if(!isAvailable()){
-            ERR("ChatGPTProvider sendMessage model not available");
+            ERR("ChatGPT发送消息失败: 模型不可用");
             return "";
         }
         // 2、构造请求参数
@@ -69,7 +69,7 @@ namespace ai_chat_sdk {
         Json::StreamWriterBuilder builder;
         builder["indentation"] = "";
         std::string requestBodyStr = Json::writeString(builder, requestBody);
-        INFO("ChatGPTProvider sendMessage requestBody: {}", requestBodyStr);
+        INFO("ChatGPT发送消息请求体: {}", requestBodyStr);
         // 5、使用cpp-httplib库构建客户端
         httplib::Client client(_endpoint.c_str());
         client.set_connection_timeout(30, 0);
@@ -84,34 +84,34 @@ namespace ai_chat_sdk {
         auto resp = client.Post("/v1/responses", headers, requestBodyStr, "application/json");
         if (!resp) {
             auto err = resp.error();
-            ERR("ChatGPTProvider sendMessage POST request failed, error: {}, error_message: {}", 
+            ERR("ChatGPT发送消息失败: POST请求失败, error: {}, error_message: {}", 
                 static_cast<int>(err), httplib::to_string(err));
             return "";
         }
         // 检测响应是否成功
         if (resp->status != 200) {
-            INFO("ChatGPTProvider sendMessage POST request failed, status : {}",resp->status);
+            ERR("ChatGPT发送消息失败: POST请求失败, status : {}",resp->status);
             return "";
         }
-        INFO("ChatGPTProvider sendMessage POST request body : {}", resp->body);
+        INFO("ChatGPT发送消息响应体 : {}", resp->body);
         // 7、解析响应体
         Json::Value responseBody;
         Json::CharReaderBuilder readerBuilder;
         std::string parseError;
         std::istringstream responseStream(resp->body);
         if (!Json::parseFromStream(readerBuilder, responseStream, &responseBody, &parseError)) {
-            ERR("ChatGPTProvider sendMessage json parse failed, error : {}", parseError);
+            ERR("ChatGPT发送消息失败: JSON解析失败, error : {}", parseError);
             return "";
         }
         if (responseBody.isMember("output") && responseBody["output"].isArray() && !responseBody["output"].empty()) {
             auto output = responseBody["output"][0];
             if (output.isMember("content") && output["content"].isArray() && !output["content"].empty() && output["content"][0].isMember("text")) {
                 std::string replyContent = output["content"][0]["text"].asString();
-                INFO("ChatGPTProvider response txt : {}", replyContent);
+                INFO("ChatGPT响应内容 : {}", replyContent);
                 return replyContent;
             }
         }
-        ERR("ChatGPTProvider sendMessage parse response body failed, parseError : {}", parseError);
+        ERR("ChatGPT发送消息失败: 响应体解析失败, parseError : {}", parseError);
         return "";
     }
 
@@ -122,7 +122,7 @@ namespace ai_chat_sdk {
         std::function<void(const std::string &, bool)> callback) {
         // 1、模型是否可用
         if(!isAvailable()){
-            ERR("ChatGPTProvider sendMessageStream model not available");
+            ERR("ChatGPT流式发送失败: 模型不可用");
             return "";
         }
         // 2、构造请求参数
@@ -153,7 +153,7 @@ namespace ai_chat_sdk {
         Json::StreamWriterBuilder builder;
         builder["indentation"] = "";
         std::string requestBodyStr = Json::writeString(builder, requestBody);
-        INFO("ChatGPTProvider sendMessageStream requestBody: {}", requestBodyStr);
+        INFO("ChatGPT流式发送请求体: {}", requestBodyStr);
         // 6、使用cpp-httplib库构建客户端
         httplib::Client client(_endpoint.c_str());
         client.set_connection_timeout(30, 0);
@@ -191,7 +191,7 @@ namespace ai_chat_sdk {
                 return false;
             }
             buffer.append(data, len);
-            INFO("ChatGPTProvider sendMessageStream buffer: {}", buffer);
+            INFO("ChatGPT流式发送缓冲区: {}", buffer);
             size_t pos;
             while ((pos = buffer.find("\n\n")) != std::string::npos) {
                 std::string event = buffer.substr(0, pos);
@@ -211,14 +211,14 @@ namespace ai_chat_sdk {
                         eventData = line.substr(6);
                     }
                 }
-                INFO("ChatGPTProvider sendMessageStream eventType: {}, eventData: {}", eventType, eventData);
+                INFO("ChatGPT流式发送事件: eventType: {}, eventData: {}", eventType, eventData);
                 // 反序列化数据
                 Json::Value chunk;
                 Json::CharReaderBuilder builder;
                 std::string err;
                 std::istringstream eventDataStream(eventData);
                 if (!Json::parseFromStream(builder, eventDataStream, &chunk, &err)) {
-                    ERR("ChatGPTProvider sendMessageStream parse event data failed, err : {}", err);
+                    ERR("ChatGPT流式发送失败: 解析事件数据失败, err : {}", err);
                     continue;
                 }
                 if (eventType == "response.output_text.delta") {
@@ -247,11 +247,11 @@ namespace ai_chat_sdk {
         };
         auto result = client.send(req);
         if(!result){
-            ERR("ChatGPTProvider sendMessageStream POST request failed, error: {}", to_string(result.error()));
+            ERR("ChatGPT流式发送失败: POST请求失败, error: {}", to_string(result.error()));
             return "";
         }
         if (!streamEnd) {
-            WARN("stream ended without [DONE] marker");
+            WARN("ChatGPT流式发送警告: 流未正常结束(缺少[DONE]标记)");
             callback("", true);
             return "";
         }

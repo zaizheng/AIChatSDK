@@ -35,23 +35,23 @@ namespace ai_chat_server{
             deepseekConfig, chatGPTConfig, ollamaConfig
         };
 
-        INFO("start init ChatSDK models...");
+        INFO("开始初始化ChatSDK模型...");
         if(!_chatSDK->initModels(modelConfigs)){
-            ERR("ChatSDK init Failed!!!");
+            ERR("ChatSDK初始化失败!!!");
             return;
         }
-        INFO("ChatSDK models init success!!!");
+        INFO("ChatSDK模型初始化成功!!!");
 
         _chatServer = std::make_unique<httplib::Server>();
         if(!_chatServer){
-            ERR("ChatServer init Failed!!!");
+            ERR("ChatServer初始化失败!!!");
             return;
         }
     }
 
     bool ChatServer::start(){
         if(_isRunning.load()){
-            ERR("ChatServer is running!!!");
+            ERR("ChatServer已在运行中!!!");
             return false;
         }
 
@@ -61,18 +61,18 @@ namespace ai_chat_server{
 
         std::thread serverThread([this](){
             _chatServer->listen(_config.host, _config.port);
-            INFO("ChatServer start on {} :{}", _config.host, _config.port);
+            INFO("ChatServer启动于 {} :{}", _config.host, _config.port);
         });
 
         serverThread.detach();
         _isRunning.store(true);
-        INFO("ChatServer start success!!!");
+        INFO("ChatServer启动成功!!!");
         return true;
     }
 
     void ChatServer::stop(){
         if(!_isRunning.load()){
-            ERR("ChatServer is not running!!!");
+            ERR("ChatServer未在运行!!!");
             return;
         }
 
@@ -81,7 +81,7 @@ namespace ai_chat_server{
         }
 
         _isRunning.store(false);
-        INFO("ChatServer stop success!!!");
+        INFO("ChatServer停止成功!!!");
     }
 
     bool ChatServer::isRunning() const{

@@ -8,14 +8,14 @@ namespace ai_chat_sdk {
         // 创建并打开数据库
         int rc = sqlite3_open(dbName.c_str(), &_db);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::DataManager: open database failed: {}", sqlite3_errmsg(_db));
+            ERR("数据库打开失败: {}", sqlite3_errmsg(_db));
         }
-        INFO("DataManager::DataManager: open database success: {}", dbName);
+        INFO("数据库打开成功: {}", dbName);
         // 初始化数据库
         if (!initDatabase()) {
             sqlite3_close(_db);
             _db = nullptr;
-            ERR("DataManager::DataManager: initDatabase failed");
+            ERR("数据库初始化失败");
         }
     }
     DataManager::~DataManager() {
@@ -56,13 +56,13 @@ namespace ai_chat_sdk {
     // 执行SQL语句
     bool DataManager::executeSQL(const std::string &sql) {
         if (!_db) {
-            ERR("DataManager::executeSQL: database is null");
+            ERR("数据库连接为空");
             return false;
         }
         char* errMsg = nullptr;
         int rc = sqlite3_exec(_db, sql.c_str(), nullptr, nullptr, &errMsg);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::executeSQL: execute SQL failed: {}", errMsg);
+            ERR("SQL执行失败: {}", errMsg);
             sqlite3_free(errMsg);
             return false;
         }
@@ -79,7 +79,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, insertSessionSql.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::insertSession: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("会话插入-准备语句失败: {}", sqlite3_errmsg(_db));
             return false;
         }
         // bind
@@ -90,12 +90,12 @@ namespace ai_chat_sdk {
         // execute
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::insertSession: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("会话插入-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return false;
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::insertSession: insert session success: {}", session._sessionId);
+        INFO("会话插入成功: {}", session._sessionId);
         return true;
     }
     // 获取会话信息
@@ -107,7 +107,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, selectSessionSql.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::getSessionInfo: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取会话-准备语句失败: {}", sqlite3_errmsg(_db));
             return nullptr;
         }
         // bind
@@ -115,7 +115,7 @@ namespace ai_chat_sdk {
         // execute
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::getSessionInfo: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取会话-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return nullptr;
         }
@@ -131,7 +131,7 @@ namespace ai_chat_sdk {
         
         sqlite3_finalize(stmt);
         session->_messages = getSessionMessages(sessionId);
-        INFO("DataManager::getSessionInfo: get session success: {}", sessionId);
+        INFO("获取会话成功: {}", sessionId);
         return session;
     }
     // 更新会话时间戳
@@ -143,7 +143,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, updateSessionSql.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::updateSessionTimestamp: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("更新会话时间戳-准备语句失败: {}", sqlite3_errmsg(_db));
             return false;
         }
         // bind
@@ -152,12 +152,12 @@ namespace ai_chat_sdk {
         // execute
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::updateSessionTimestamp: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("更新会话时间戳-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return false;
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::updateSessionTimestamp: update session timestamp success: {}", sessionId);
+        INFO("更新会话时间戳成功: {}", sessionId);
         return true;
     }
     // 删除会话
@@ -169,7 +169,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, deleteSessionSql.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::deleteSession: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("删除会话-准备语句失败: {}", sqlite3_errmsg(_db));
             return false;
         }
         // bind
@@ -177,12 +177,12 @@ namespace ai_chat_sdk {
         // execute
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::deleteSession: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("删除会话-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return false;
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::deleteSession: delete session success: {}", sessionId);
+        INFO("删除会话成功: {}", sessionId);
         return true;
     }
     // 获取所有会话ID
@@ -194,7 +194,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, selectSessionIdsSql.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::getAllSessionIds: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取所有会话ID-准备语句失败: {}", sqlite3_errmsg(_db));
             return {};
         }
         std::vector<std::string> sessionIds;
@@ -202,7 +202,7 @@ namespace ai_chat_sdk {
             sessionIds.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::getAllSessionIds: get all session ids success, total {}", sessionIds.size());
+        INFO("获取所有会话ID成功，总数: {}", sessionIds.size());
         return sessionIds;
     }
     // 获取所有会话信息, 按更新时间降序排序
@@ -214,7 +214,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, selectSQL.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::getAllSessions: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取所有会话-准备语句失败: {}", sqlite3_errmsg(_db));
             return {};
         }
         std::vector<std::shared_ptr<Session>> sessions;
@@ -230,7 +230,7 @@ namespace ai_chat_sdk {
             sessions.push_back(session);
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::getAllSessions: get all sessions success, total {}", sessions.size());
+        INFO("获取所有会话成功，总数: {}", sessions.size());
         return sessions;
     }
     // 获取会话总数
@@ -242,18 +242,18 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, selectSQL.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::getSessionCount: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取会话数量-准备语句失败: {}", sqlite3_errmsg(_db));
             return 0;
         }
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_ROW) {
-            ERR("DataManager::getSessionCount: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取会话数量-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return 0;
         }
         size_t count = sqlite3_column_int64(stmt, 0);
         sqlite3_finalize(stmt);
-        INFO("DataManager::getSessionCount: get session count success: {}", count);
+        INFO("获取会话数量成功: {}", count);
         return count;
     }
     // 删除所有会话
@@ -265,17 +265,17 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, deleteAllSessionsSql.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::deleteAllSessions: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("删除所有会话-准备语句失败: {}", sqlite3_errmsg(_db));
             return false;
         }
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::deleteAllSessions: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("删除所有会话-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return false;
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::deleteAllSessions: delete all sessions success");
+        INFO("删除所有会话成功");
         return true;
     }
     //////////////////////////////////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, insertMessageSql.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::insertMessage: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("消息插入-准备语句失败: {}", sqlite3_errmsg(_db));
             return false;
         }
         sqlite3_bind_text(stmt, 1, message._messageId.c_str(), -1, SQLITE_TRANSIENT);
@@ -301,7 +301,7 @@ namespace ai_chat_sdk {
 
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::insertMessage: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("消息插入-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return false;
         }
@@ -312,7 +312,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *updateStmt;
         rc = sqlite3_prepare_v2(_db, updateSessionSql.c_str(), -1, &updateStmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::insertMessage: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("消息插入-更新会话时间戳失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return false;
         }
@@ -320,13 +320,13 @@ namespace ai_chat_sdk {
         sqlite3_bind_text(updateStmt, 2, sessionId.c_str(), -1, SQLITE_TRANSIENT);
         rc = sqlite3_step(updateStmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::insertMessage: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("消息插入-更新会话时间戳执行失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(updateStmt);
             return false;
         }
         sqlite3_finalize(stmt);
         sqlite3_finalize(updateStmt);
-        INFO("DataManager::insertMessage: insert message success, messageId {}", message._messageId);
+        INFO("消息插入成功, messageId {}", message._messageId);
         return true;
     }
     // 获取会话中所有消息
@@ -338,7 +338,7 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, selectSQL.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::getSessionMessages: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取会话消息-准备语句失败: {}", sqlite3_errmsg(_db));
             return {};
         }
         sqlite3_bind_text(stmt, 1, sessionId.c_str(), -1, SQLITE_TRANSIENT);
@@ -352,12 +352,12 @@ namespace ai_chat_sdk {
           messages.push_back(msg);
         }
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::getSessionMessages: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("获取会话消息-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return {};
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::getSessionMessages: get session messages success, sessionId {}", sessionId);
+        INFO("获取会话消息成功, sessionId {}", sessionId);
         return messages;
     }
     // 删除制定会话的历史消息
@@ -369,18 +369,18 @@ namespace ai_chat_sdk {
         sqlite3_stmt *stmt;
         int rc = sqlite3_prepare_v2(_db, deleteSQL.c_str(), -1, &stmt, nullptr);
         if (rc != SQLITE_OK) {
-            ERR("DataManager::deleteSessionMessages: prepare statement failed: {}", sqlite3_errmsg(_db));
+            ERR("删除会话消息-准备语句失败: {}", sqlite3_errmsg(_db));
             return false;
         }
         sqlite3_bind_text(stmt, 1, sessionId.c_str(), -1, SQLITE_TRANSIENT);
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            ERR("DataManager::deleteSessionMessages: step statement failed: {}", sqlite3_errmsg(_db));
+            ERR("删除会话消息-执行语句失败: {}", sqlite3_errmsg(_db));
             sqlite3_finalize(stmt);
             return false;
         }
         sqlite3_finalize(stmt);
-        INFO("DataManager::deleteSessionMessages: delete session messages success, sessionId {}", sessionId);
+        INFO("删除会话消息成功, sessionId {}", sessionId);
         return true;
     }
 } // namespace ai_chat_sdk

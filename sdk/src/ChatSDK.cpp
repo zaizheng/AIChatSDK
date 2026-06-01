@@ -22,14 +22,14 @@ namespace ai_chat_sdk {
             auto deepseekProvider = std::make_unique<DeepSeekProvider>();
             _llmManager.registerProvider("deepseek-chat",
                                          std::move(deepseekProvider));
-            INFO("DeepSeek provider registered successfully");
+            INFO("DeepSeek Provider注册成功");
         }
         // chatgpt
         if (!_llmManager.isModelAvailable("gpt-4o-mini")) {
             auto chatgptProvider = std::make_unique<ChatGPTProvider>();
             _llmManager.registerProvider("gpt-4o-mini",
                                          std::move(chatgptProvider));
-            INFO("ChatGPT provider registered successfully");
+            INFO("ChatGPT Provider注册成功");
         }
         // ollama
         std::unordered_set<std::string> modelNames;
@@ -41,7 +41,7 @@ namespace ai_chat_sdk {
                     modelNames.insert(modelName);
                     if (!_llmManager.isModelAvailable(modelName)) {
                         _llmManager.registerProvider(modelName, std::make_unique<OllamaLLMProvider>());
-                        INFO("Ollama provider registered successfully");
+                        INFO("Ollama Provider注册成功");
                     }
                 }
             }
@@ -55,51 +55,51 @@ namespace ai_chat_sdk {
                   apiconfig->_modelName == "gpt-4o-mini") {
                     initAPIModelProvider(apiconfig->_modelName, apiconfig);
                 } else {
-                    ERR("ChatSDK initProviders model not supported: {}", apiconfig->_modelName);
+                    ERR("ChatSDK初始化Provider失败: 模型不支持: {}", apiconfig->_modelName);
                 }
             } else if (auto ollamaConfig = std::dynamic_pointer_cast<OllamaConfig>(config)) {
                 initOllamaModelProvider(ollamaConfig->_modelName, ollamaConfig);
             } else {
-                ERR("ChatSDK initProviders config not supported: {}", config->_modelName);
+                ERR("ChatSDK初始化Provider失败: 配置不支持: {}", config->_modelName);
             }
         }
     }
     // API初始化
     bool ChatSDK::initAPIModelProvider(const std::string& modelName, const std::shared_ptr<APIConfig>& apiConfig) {
         if (modelName.empty()) {
-            ERR("ChatSDK initAPIModelProvider modelName is empty");
+            ERR("初始化API模型失败: modelName为空");
             return false;
         }
         if (!apiConfig || apiConfig->_apiKey.empty()) {
-            ERR("ChatSDK initAPIModelProvider apiConfig is null");
+            ERR("初始化API模型失败: apiConfig为空或API Key为空");
             return false;
         }
         if (_llmManager.isModelAvailable(modelName)) {
-            INFO("ChatSDK initAPIModelProvider model {} is already available", modelName);
+            INFO("API模型已可用: {}", modelName);
             return true;
         }
         std::map<std::string, std::string> modelParams;
         modelParams["api_key"] = apiConfig->_apiKey;
         if (!_llmManager.initModel(modelName, modelParams)) {
-            ERR("ChatSDK initAPIModelProvider initModel failed : {}", modelName);
+            ERR("初始化API模型失败: {}", modelName);
             return false;
         }
         _modelConfigs[modelName] = apiConfig;
-        INFO("ChatSDK initAPIModelProvider model {} is available", modelName);
+        INFO("API模型初始化成功: {}", modelName);
         return true;
     }
     // Ollama初始化
     bool ChatSDK::initOllamaModelProvider(const std::string& modelName, const std::shared_ptr<OllamaConfig>& ollamaConfig) {
         if (modelName.empty()) {
-            ERR("ChatSDK initOllamaModelProvider modelName is empty");
+            ERR("初始化Ollama模型失败: modelName为空");
             return false;
         }
         if (!ollamaConfig || ollamaConfig->_endpoint.empty()) {
-            ERR("ChatSDK initOllamaModelProvider ollamaConfig is null or endpoint is empty");
+            ERR("初始化Ollama模型失败: ollamaConfig为空或endpoint为空");
             return false;
         }
         if (_llmManager.isModelAvailable(modelName)) {
-            INFO("ChatSDK initOllamaModelProvider model {} is already available", modelName);
+            INFO("Ollama模型已可用: {}", modelName);
             return true;
         }
         std::map<std::string, std::string> modelParams;
@@ -107,45 +107,45 @@ namespace ai_chat_sdk {
         modelParams["model_desc"] = ollamaConfig->_modelDesc;
         modelParams["endpoint"] = ollamaConfig->_endpoint;
         if (!_llmManager.initModel(modelName, modelParams)) {
-            ERR("ChatSDK initOllamaModelProvider initModel failed : {}", modelName);
+            ERR("初始化Ollama模型失败: {}", modelName);
             return false;
         }
         _modelConfigs[modelName] = ollamaConfig;
-        INFO("ChatSDK initOllamaModelProvider model {} is available", modelName);
+        INFO("Ollama模型初始化成功: {}", modelName);
         return true;
     }
     // 创建会话
     std::string ChatSDK::createSession(const std::string &modelName) {
         if (!_initialized) {
-            ERR("ChatSDK createSession not initialized");
+            ERR("创建会话失败: ChatSDK未初始化");
             return "";
         }
         auto sessionId = _sessionManager.createSession(modelName);
         if (sessionId.empty()) {
-            ERR("ChatSDK createSession createSession failed : {}", modelName);
+            ERR("创建会话失败: {}", modelName);
             return "";
         }
-        INFO("ChatSDK createSession createSession success : {}", sessionId);
+        INFO("创建会话成功: {}", sessionId);
         return sessionId;
     }
     // 获取指定会话
     std::shared_ptr<Session> ChatSDK::getSession(const std::string& sessionId) {
         if (!_initialized) {
-            ERR("ChatSDK getSession not initialized");
+            ERR("获取会话失败: ChatSDK未初始化");
             return nullptr;
         }
         auto session = _sessionManager.getSession(sessionId);
         if (!session) {
-            ERR("ChatSDK getSession session not found : {}", sessionId);
+            ERR("获取会话失败: 会话不存在: {}", sessionId);
             return nullptr;
         }
-        INFO("ChatSDK getSession session {} found", sessionId);
+        INFO("获取会话成功: {}", sessionId);
         return session;
     }
     // 获取所有会话列表
     std::vector<std::string> ChatSDK::getSessionsLists() const {
         if (!_initialized) {
-            ERR("ChatSDK getSessionsLists not initialized");
+            ERR("获取会话列表失败: ChatSDK未初始化");
             return {};
         }
         return _sessionManager.getSessionList();
@@ -153,14 +153,14 @@ namespace ai_chat_sdk {
     // 删除会话
     bool ChatSDK::deleteSession(const std::string& sessionId) {
         if (!_initialized) {
-            ERR("ChatSDK deleteSession not initialized");
+            ERR("删除会话失败: ChatSDK未初始化");
             return false;
         }
         if (!_sessionManager.deleteSession(sessionId)) {
-            ERR("ChatSDK deleteSession session not found : {}", sessionId);
+            ERR("删除会话失败: 会话不存在: {}", sessionId);
             return false;
         }
-        INFO("ChatSDK deleteSession session {} deleted", sessionId);
+        INFO("删除会话成功: {}", sessionId);
         return true;
     }
     // 获取可用的模型信息
@@ -170,12 +170,12 @@ namespace ai_chat_sdk {
     // 发送消息给指定模型
     std::string ChatSDK::sendMessage(const std::string &sessionId, const std::string& message) {
         if (!_initialized) {
-            ERR("ChatSDK sendMessage not initialized");
+            ERR("发送消息失败: ChatSDK未初始化");
             return "";
         }
         auto session = getSession(sessionId);
         if (!session) {
-            ERR("ChatSDK sendMessage session not found : {}", sessionId);
+            ERR("发送消息失败: 会话不存在: {}", sessionId);
             return "";
         }
         Message userMessage("user", message);
@@ -184,7 +184,7 @@ namespace ai_chat_sdk {
 
         auto it = _modelConfigs.find(session->_modelName);
         if (it == _modelConfigs.end()) {
-            ERR("ChatSDK sendMessage model not found : {}", session->_modelName);
+            ERR("发送消息失败: 模型配置未找到: {}", session->_modelName);
             return "";
         }
         std::map<std::string, std::string> requestParams;
@@ -194,25 +194,25 @@ namespace ai_chat_sdk {
         auto response = _llmManager.sendMessage(it->second->_modelName,
                                                 historyMessages, requestParams);
         if (response.empty()) {
-            ERR("ChatSDK sendMessage sendMessage failed : {}", session->_modelName);
+            ERR("发送消息失败: 模型响应为空: {}", session->_modelName);
             return "";
         }
 
         Message assistantMessage("assistant", response);
         _sessionManager.addMessage(sessionId, assistantMessage);
         _sessionManager.updateSessionTimestamp(sessionId);
-        INFO("ChatSDK sendMessage sendMessage success : {}", session->_modelName);
+        INFO("发送消息成功: {}", session->_modelName);
         return response;
     }
     // 发送流式消息给指定模型
     std::string ChatSDK::sendMessageStream(const std::string &sessionId, const std::string& message, std::function<void(const std::string&, bool)> callback) {
         if (!_initialized) {
-            ERR("ChatSDK sendMessageStream not initialized");
+            ERR("发送流式消息失败: ChatSDK未初始化");
             return "";
         }
         auto session = getSession(sessionId);
         if (!session) {
-            ERR("ChatSDK sendMessageStream session not found : {}", sessionId);
+            ERR("发送流式消息失败: 会话不存在: {}", sessionId);
             return "";
         }
         Message userMessage("user", message);
@@ -221,7 +221,7 @@ namespace ai_chat_sdk {
         
         auto it = _modelConfigs.find(session->_modelName);
         if (it == _modelConfigs.end()) {
-            ERR("ChatSDK sendMessageStream model not found : {}", session->_modelName);
+            ERR("发送流式消息失败: 模型配置未找到: {}", session->_modelName);
             return "";
         }
         std::map<std::string, std::string> requestParams;
@@ -231,13 +231,13 @@ namespace ai_chat_sdk {
         auto response = _llmManager.sendMessageStream(it->second->_modelName,
                                                 historyMessages, requestParams, callback);
         if (response.empty()) {
-            ERR("ChatSDK sendMessageStream sendMessageStream failed : {}", session->_modelName);
+            ERR("发送流式消息失败: 模型响应为空: {}", session->_modelName);
             return "";
         }
         Message assistantMessage("assistant", response);
         _sessionManager.addMessage(sessionId, assistantMessage);
         _sessionManager.updateSessionTimestamp(sessionId);
-        INFO("ChatSDK sendMessageStream sendMessageStream success : {}", session->_modelName);
+        INFO("发送流式消息成功: {}", session->_modelName);
         return response;
     }
 }

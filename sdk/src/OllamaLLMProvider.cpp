@@ -12,7 +12,7 @@ bool OllamaLLMProvider::initModel(
         // 初始化模型名称
         auto it = modelConfig.find("model_name");
         if (it == modelConfig.end()) {
-            ERR("OllamaLLMProvider initModel model_name not found");
+            ERR("Ollama初始化失败: model_name未找到");
             return false;
         } else {
             _modelName = it->second;
@@ -20,7 +20,7 @@ bool OllamaLLMProvider::initModel(
         // 初始化模型描述
         it = modelConfig.find("model_desc");
         if (it == modelConfig.end()) {
-            ERR("OllamaLLMProvider initModel model_desc not found");
+            ERR("Ollama初始化失败: model_desc未找到");
             return false;
         } else {
             _modelDesc = it->second;
@@ -28,7 +28,7 @@ bool OllamaLLMProvider::initModel(
         // 初始化endpoint
         it = modelConfig.find("endpoint");
         if (it == modelConfig.end()) {
-            ERR("OllamaLLMProvider initModel endpoint not found");
+            ERR("Ollama初始化失败: endpoint未找到");
             return false;
         } else {
             _endpoint = it->second;
@@ -45,7 +45,7 @@ bool OllamaLLMProvider::initModel(
         const std::map<std::string, std::string> &requestParams) {
         // 模型是否可用
         if (!_isAvailable) {
-            ERR("OllamaLLMProvider sendMessage model not available");
+            ERR("Ollama发送消息失败: 模型不可用");
             return "";
         }
         // 构建请求参数
@@ -89,13 +89,13 @@ bool OllamaLLMProvider::initModel(
         // 发送POST请求
         auto response = client.Post("/api/chat", headers, requestBodyStr, "application/json");
         if (!response) {
-            ERR("OllamaLLMProvider sendMessage response is null, error : {}", to_string(response.error()));
+            ERR("Ollama发送消息失败: 响应为空, error : {}", to_string(response.error()));
             return "";
         }
-        INFO("OllamaLLMProvider sendMessage response : {}", response->body);
-        INFO("OllamaLLMProvider sendMessage response status : {}", response->status);
+        INFO("Ollama发送消息响应体 : {}", response->body);
+        INFO("Ollama发送消息响应状态 : {}", response->status);
         if (response->status != 200) {
-            ERR("OllamaLLMProvider sendMessage response status not 200, status : {}", response->status);
+            ERR("Ollama发送消息失败: 响应状态码非200, status : {}", response->status);
             return "";
         }
         // 反序列化
@@ -104,18 +104,18 @@ bool OllamaLLMProvider::initModel(
         std::string errors;
         std::istringstream responseStream(response->body);
         if(!Json::parseFromStream(reader, responseStream, &responseBody, &errors)){
-            ERR("OllamaLLMProvider sendMessage failed to parse response body, errors: {}", errors);
+            ERR("Ollama发送消息失败: 解析响应体失败, errors: {}", errors);
             return "";
         }
         // 提取生成文本
         std::string modelResponse = "";
         if (responseBody.isMember("message") && responseBody["message"].isObject() && responseBody["message"].isMember("content")) {
             modelResponse = responseBody["message"]["content"].asString();
-            INFO("OllamaLLMProvider sendMessage modelResponse : {}", modelResponse);
+            INFO("Ollama响应内容 : {}", modelResponse);
             return modelResponse;
         }
         // 处理其他情况
-        ERR("OllamaLLMProvider sendMessage invalid response format");
+        ERR("Ollama发送消息失败: 响应格式无效");
         return "";
     }
     // 流式返回
@@ -125,7 +125,7 @@ bool OllamaLLMProvider::initModel(
         std::function<void(const std::string &, bool)> callback) {
         // 模型是否可用
         if (!_isAvailable) {
-            ERR("OllamaLLMProvider sendMessageStream model not available");
+            ERR("Ollama流式发送失败: 模型不可用");
             return "";
         }
         // 构建请求参数
@@ -183,7 +183,7 @@ bool OllamaLLMProvider::initModel(
         req.response_handler = [&](const httplib::Response &resp) {
             if (resp.status != 200) {
                 getError = true;
-                errorMsg = "OllamaLLMProvider::sendMessageStream: failed to send request, status: " + std::to_string(resp.status);
+                errorMsg = "Ollama流式发送失败: 请求发送失败, status: " + std::to_string(resp.status);
                 return false;
             }
             return true;
@@ -206,9 +206,9 @@ bool OllamaLLMProvider::initModel(
                 std::string errors;
                 std::istringstream chunkStream(chunk);
                 if(!Json::parseFromStream(reader, chunkStream, &chunkJson, &errors)){
-                    ERR("OllamaLLMProvider sendMessageStream failed to parse chunk, errors: {}", errors);
-                    continue;
-                }
+            ERR("Ollama流式发送失败: 解析chunk失败, errors: {}", errors);
+            continue;
+        }
                 if (chunkJson.isMember("message") && chunkJson["message"].isMember("content")) {
                     std::string delta = chunkJson["message"]["content"].asString();
                     fullData += delta;
@@ -224,11 +224,11 @@ bool OllamaLLMProvider::initModel(
         };
         auto resp = client.send(req);
         if (resp == nullptr) {
-            ERR("OllamaLLMProvider::sendMessageStream: failed to send request, error: {}", to_string(resp.error()));
+            ERR("Ollama流式发送失败: 请求发送失败, error: {}", to_string(resp.error()));
             return "";
         }
         if (!streamEnd) {
-            ERR("OllamaLLMProvider::sendMessageStream: stream not end");
+            ERR("Ollama流式发送失败: 流未结束");
             callback("", true);
         }
         return fullData;

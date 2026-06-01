@@ -65,7 +65,7 @@ namespace ai_chat_sdk {
             session->_messages = _dataManager.getSessionMessages(sessionId);
             return session;
         }
-        WARN("SessionManager::getSessionInfo: sessionId {} not found", sessionId);
+        WARN("会话未找到: sessionId {}", sessionId);
         return nullptr;
     }
     // 向某个会话中添加信息
@@ -79,10 +79,10 @@ namespace ai_chat_sdk {
         Message msg(message._role, message._content);
         msg._messageId = generateMessageId(it->second->_messages.size());
         msg._timestamp = std::time(nullptr);
-        INFO("message Info: content {}  timestamp {}", msg._content, msg._timestamp);
+        INFO("消息信息: content {}  timestamp {}", msg._content, msg._timestamp);
         it->second->_messages.push_back(msg);
         it->second->_updatedAt = std::time(nullptr);
-        INFO("SessionManager::addMessage: sessionId {}, message.content {}", sessionId, msg._content);
+        INFO("添加消息成功: sessionId {}, message.content {}", sessionId, msg._content);
         _mutex.unlock();
         _dataManager.insertMessage(sessionId, msg);
         return true;
@@ -107,7 +107,7 @@ namespace ai_chat_sdk {
         }
         _mutex.unlock();
         _dataManager.updateSessionTimestamp(sessionId, std::time(nullptr));
-        INFO("SessionManager::updateSessionTimestamp: sessionId {}", sessionId);
+        INFO("更新会话时间戳: sessionId {}", sessionId);
     }
     // 获取会话列表
     std::vector<std::string> SessionManager::getSessionList() const {

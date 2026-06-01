@@ -5,12 +5,12 @@ namespace ai_chat_sdk {
     // 注册LLM提供者
     bool LLMManager::registerProvider(const std::string& modelName, std::unique_ptr<LLMProvider> provider) {
         if (!provider) {
-            ERR("cannot register nullptr provider, modelName = {}", modelName);
+            ERR("注册Provider失败: provider为空, modelName = {}", modelName);
             return false;
         }
         _providers[modelName] = std::move(provider);
         _modelInfos[modelName] = ModelInfo(modelName);
-        INFO("register provider success, modelName = {}", modelName);
+        INFO("注册Provider成功, modelName = {}", modelName);
         return true;
     }
     // 初始化指定模型
@@ -22,9 +22,9 @@ namespace ai_chat_sdk {
         }
         bool isSuccess = it->second->initModel(modelParam);
         if (!isSuccess) {
-            ERR("init model failed, modelName = {}", modelName);
+            ERR("模型初始化失败, modelName = {}", modelName);
         } else {
-            INFO("init model success, modelName = {}", modelName);
+            INFO("模型初始化成功, modelName = {}", modelName);
             _modelInfos[modelName]._modelDesc = it->second->getModelDesc();
             _modelInfos[modelName]._isAvailable = true;
         }
@@ -54,11 +54,11 @@ namespace ai_chat_sdk {
         const std::map<std::string, std::string> &requestParam) {
         auto it = _providers.find(modelName);
         if (it == _providers.end()) {
-            ERR("model not found, modelName = {}", modelName);
+            ERR("模型未找到, modelName = {}", modelName);
             return "";
         }
         if (!it->second->isAvailable()) {
-            ERR("model not available, modelName = {}", modelName);
+            ERR("模型不可用, modelName = {}", modelName);
             return "";
         }
         return it->second->sendMessage(messages, requestParam);
@@ -70,11 +70,11 @@ namespace ai_chat_sdk {
         std::function<void(const std::string &, bool)> callback) {
         auto it = _providers.find(modelName);
         if (it == _providers.end()) {
-            ERR("model not found, modelName = {}", modelName);
+            ERR("模型未找到, modelName = {}", modelName);
             return "";
         }
         if (!it->second->isAvailable()) {
-            ERR("model not available, modelName = {}", modelName);
+            ERR("模型不可用, modelName = {}", modelName);
             return "";
         }
         return it->second->sendMessageStream(messages, requestParam, callback);

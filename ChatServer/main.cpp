@@ -39,26 +39,26 @@ std::string getEnvVar(const std::string& key) {
 bool validateConfig(ai_chat_server::ServerConfig& config) {
     // 验证温度值
     if (config.temperature < 0.0 || config.temperature > 2.0) {
-        ERR("错误: 温度值必须在0.0到2.0之间，当前值: {}", config.temperature);
+        ERR("配置验证失败: 温度值必须在0.0到2.0之间，当前值: {}", config.temperature);
         return false;
     }
 
     // 验证最大token数
     if (config.maxTokens <= 0) {
-        ERR("错误: 最大token数必须为正数，当前值: {}", config.maxTokens);
+        ERR("配置验证失败: 最大token数必须为正数，当前值: {}", config.maxTokens);
         return false;
     }
 
     // 验证至少有一个API密钥不为空
     if (config.deepseekAPIKey.empty() && config.chatGptAPIKey.empty()) {
-        ERR("错误: 至少需要提供一个有效的API密钥或Ollama模型配置");
+        ERR("配置验证失败: 至少需要提供一个有效的API密钥或Ollama模型配置");
         return false;
     }
 
     // 验证Ollama配置参数
     if (!config.ollamaModelName.empty()) {
         if (config.ollamaModelDesc.empty() || config.ollamaEndpoint.empty()) {
-            ERR("错误: 如果提供了Ollama模型名称，则必须同时提供模型描述和端点");
+            ERR("配置验证失败: 如果提供了Ollama模型名称，则必须同时提供模型描述和端点");
             return false;
         }
     }
@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
         // 创建并启动ChatServer
         ai_chat_server::ChatServer server(config);
         if (server.start()) {
-            INFO("ChatServer 启动成功!");
+            INFO("ChatServer启动成功!");
             INFO("服务器地址: http://{}:{}", config.host, config.port);
             
             // 主线程等待，让服务器在单独线程中运行
@@ -168,7 +168,7 @@ int main(int argc, char** argv) {
                 std::this_thread::sleep_for(std::chrono::seconds(100));
             }
         } else {
-            ERR("ChatServer 启动失败!");
+            ERR("ChatServer启动失败!");
             return 1;
         }
 
